@@ -17,11 +17,13 @@ export const metadata: Metadata = {
   },
 };
 
-// In production this would come from Supabase session + DB queries.
-// For now we use the mock admin user.
 async function getCurrentUser() {
-  const useMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
-  if (useMock) {
+  const hasRealSupabase =
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder') &&
+    process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'false';
+
+  if (!hasRealSupabase) {
     return {
       ...MOCK_CURRENT_USER,
       // Serialize Set → Array for server→client boundary

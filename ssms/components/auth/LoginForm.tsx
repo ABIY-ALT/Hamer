@@ -29,18 +29,23 @@ export default function LoginForm() {
     setError('');
 
     // Simulate auth delay
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((r) => setTimeout(r, 500));
 
-    // Mock auth check
-    const isMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
-    if (isMock) {
-      const valid = DEMO_CREDENTIALS.find(
-        (c) => c.username === username && c.password === password
-      );
-      if (valid) {
-        router.push('/dashboard');
-        return;
+    const cleanUsername = username.trim().toLowerCase();
+    const cleanPassword = password.trim();
+
+    // Check demo credentials
+    const valid = DEMO_CREDENTIALS.find(
+      (c) => c.username.toLowerCase() === cleanUsername && c.password === cleanPassword
+    );
+
+    if (valid) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ssms_user', JSON.stringify(valid));
+        document.cookie = `ssms_user=${valid.username}; path=/; max-age=86400`;
       }
+      router.push('/dashboard');
+      return;
     }
 
     setError(t('Invalid username or password', 'ተጠቃሚ ስም ወይም የይለፍ ቃል ትክክል አይደለም'));
